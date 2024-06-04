@@ -8,27 +8,12 @@ pub fn get_title_and_desc_from_doc(attrs: &[Attribute]) -> (Option<String>, Opti
 
     if doc.starts_with('#') {
         let mut split = doc.splitn(2, '\n');
-        let title = split
-            .next()
-            .unwrap()
-            .trim_start_matches('#')
-            .trim()
-            .to_owned();
-        let maybe_desc = split.next().and_then(merge_description_lines);
+        let title = split.next().unwrap().trim_start_matches('#').trim();
+        let maybe_desc = split.next().and_then(none_if_empty);
         (none_if_empty(title), maybe_desc)
     } else {
-        (None, merge_description_lines(&doc))
+        (None, none_if_empty(&doc))
     }
-}
-
-fn merge_description_lines(doc: &str) -> Option<String> {
-    let desc = doc
-        .trim()
-        .split("\n\n")
-        .filter_map(|line| none_if_empty(line.trim().replace('\n', " ")))
-        .collect::<Vec<_>>()
-        .join("\n\n");
-    none_if_empty(desc)
 }
 
 fn get_doc(attrs: &[Attribute]) -> Option<String> {
@@ -51,17 +36,15 @@ fn get_doc(attrs: &[Attribute]) -> Option<String> {
             None
         })
         .collect::<Vec<_>>()
-        .join("\n")
-        .trim_end()
-        .to_string();
+        .join("\n");
 
-    none_if_empty(description)
+    none_if_empty(&description)
 }
 
-fn none_if_empty(s: String) -> Option<String> {
+fn none_if_empty(s: &str) -> Option<String> {
     if s.is_empty() {
         None
     } else {
-        Some(s)
+        Some(s.into())
     }
 }
