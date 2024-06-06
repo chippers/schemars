@@ -38,7 +38,7 @@ fn get_doc(attrs: &[Attribute]) -> Option<String> {
         .collect::<Vec<_>>()
         .join("\n");
 
-    none_if_empty(&description)
+    none_if_empty(description.trim())
 }
 
 fn none_if_empty(s: &str) -> Option<String> {
